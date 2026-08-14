@@ -6,17 +6,17 @@
 // 1. Register the Lesson Custom Post Type
 function dfh_register_lesson_cpt() {
     $labels = array(
-        'name'               : 'Lessons',
-        'singular_name'      : 'Lesson',
-        'menu_name'          : 'Course Lessons',
-        'add_new'            : 'Add New Lesson',
-        'add_new_item'       : 'Add New Lesson',
-        'edit_item'          : 'Edit Lesson',
-        'new_item'           : 'New Lesson',
-        'view_item'          : 'View Lesson',
-        'search_items'       : 'Search Lessons',
-        'not_found'          : 'No lessons found',
-        'not_found_in_trash' : 'No lessons found in trash'
+        'name'               => 'Lessons',
+        'singular_name'      => 'Lesson',
+        'menu_name'          => 'Course Lessons',
+        'add_new'            => 'Add New Lesson',
+        'add_new_item'       => 'Add New Lesson',
+        'edit_item'          => 'Edit Lesson',
+        'new_item'           => 'New Lesson',
+        'view_item'          => 'View Lesson',
+        'search_items'       => 'Search Lessons',
+        'not_found'          => 'No lessons found',
+        'not_found_in_trash' => 'No lessons found in trash'
     );
 
     $args = array(
