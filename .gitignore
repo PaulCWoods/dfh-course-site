@@ -1,7 +1,0 @@
-/wp-admin/
-/wp-includes/
-/wp-content/plugins/*
-!/wp-content/plugins/advanced-custom-fields-pro/
-/wp-content/uploads/
-wp-config.php
-*.log
