@@ -15,6 +15,7 @@
 # Track only your custom theme
 /wp-content/themes/*
 !/wp-content/themes/dfh-course-theme/
+!/wp-content/themes/dfh-course-theme/**
 
 # Configuration & System Files
 wp-config.php
