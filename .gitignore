@@ -1,0 +1,23 @@
+# WordPress Core (Never track core files)
+/wp-admin/
+/wp-includes/
+*.php
+!index.php
+!wp-config-sample.php
+
+# WordPress Content (Ignore uploads and unneeded plugins, track your theme)
+/wp-content/uploads/
+/wp-content/upgrade/
+/wp-content/backup-*
+/wp-content/plugins/*
+!/wp-content/plugins/advanced-custom-fields-pro/
+
+# Track only your custom theme
+/wp-content/themes/*
+!/wp-content/themes/dfh-course-theme/
+
+# Configuration & System Files
+wp-config.php
+.DS_Store
+Thumbs.db
+*.log
