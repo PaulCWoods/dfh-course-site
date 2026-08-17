@@ -47,51 +47,43 @@ get_header();
                     the_content();
                     ?>
                 </div>
-                    <?php
-                    // Prefer ACF repeater when available, otherwise use newline post meta saved by the Stats meta box
-                    $acf_stats = (function_exists('get_field')) ? get_field('lesson_stats') : false;
-                    if ($acf_stats && is_array($acf_stats)) : ?>
-                                    <aside class="lesson-stats">
-    <ul class="lesson-stats-list">
-                            <?php foreach ($acf_stats as $row) :
-                                $label = isset($row['stat_label']) ? $row['stat_label'] : '';
-                                $value = isset($row['stat_value']) ? $row['stat_value'] : '';
-                                if (trim($label) === '' && trim($value) === '') continue; ?>
-                                <li><span class="stat-label"><?php echo esc_html($label); ?></span>: <span class="stat-value"><?php echo esc_html($value); ?></span></li>
-                            <?php endforeach; ?>
-                        </ul>
-                        </aside>
-                    <?php else:
-                        $stats_meta = get_post_meta(get_the_ID(), 'lesson_stats', true);
-                        if (!empty($stats_meta)) :
-                            $slines = explode("\n", $stats_meta);
-                            ?>
-                            <aside class="lesson-stats">
-                            <ul class="lesson-stats-list">
-                                <?php foreach ($slines as $sline) {
-                                    $sline = trim($sline);
-                                    if (empty($sline)) continue;
-                                    $parts = explode('|', $sline);
-                                    $label = trim($parts[0]);
-                                    $value = isset($parts[1]) ? trim($parts[1]) : '';
-                                    if ($label === '' && $value === '') continue;
-                                    echo '<li><span class="stat-label">' . esc_html($label) . '</span>: <span class="stat-value">' . esc_html($value) . '</span></li>';
-                                } ?>
-                            </ul>
-                            </aside>
-                        <?php endif;
-                    endif; ?>
-                </div>
+                <?php
+                // Render lesson stats from meta box post meta (`lesson_stats`) only.
+                $stats_meta = get_post_meta(get_the_ID(), 'lesson_stats', true);
+                if (!empty($stats_meta)):
+                    $slines = explode("\n", $stats_meta);
+                    ?>
+                    <aside class="lesson-stats">
+                        <h2>Lesson statistics</h2>
+                        <dl class="lesson-stats-list">
+                            <?php foreach ($slines as $sline) {
+                                $sline = trim($sline);
+                                if (empty($sline))
+                                    continue;
+                                $parts = explode('|', $sline);
+                                $label = trim($parts[0]);
+                                $value = isset($parts[1]) ? trim($parts[1]) : '';
+                                if ($label === '' && $value === '')
+                                    continue;
+                                echo '<div class="stat">';
+                                echo '<dt class="stat-label">' . esc_html($label) . '</dt>';
+                                echo '<dd class="stat-value">' . esc_html($value) . '</dd>';
+                                echo '</div>';
+                            } ?>
+                        </dl>
+                    </aside>
+                <?php endif; ?>
             </div>
+        </div>
 
-            
+
 
         </div><!-- .lesson-content-container -->
 
     </article><!-- #post-<?php the_ID(); ?> -->
 
-    <?php 
-    $external_links = get_post_meta( get_the_ID(), 'lesson_external_links', true );
+    <?php
+    $external_links = get_post_meta(get_the_ID(), 'lesson_external_links', true);
     if (!empty($external_links)):
         ?>
         <section class="lesson-resources lesson-links pd-fl-x2" aria-describedby="lesson-links-heading">
@@ -119,41 +111,30 @@ get_header();
     <?php endif; ?>
 
     <?php
-            // Downloadable Assets - prefer ACF file array when available, otherwise use newline meta saved by the Downloads meta box
-            $acf_download = (function_exists('get_field')) ? get_field('lesson_downloads') : false;
-            if ($acf_download && is_array($acf_download)):
-                ?>
-                <section class="lesson-resources lesson-downloads pd-fl-x2" aria-describedby="lesson-downloads-heading">
-                    <h2 class="heading" id="lesson-downloads-heading">Downloadable Resources</h2>
-                    <a href="<?php echo esc_url($acf_download['url']); ?>" class="button download-button" download>
-                        Download <?php echo esc_html($acf_download['title']); ?>
-                        (<?php echo strtoupper(esc_html($acf_download['subtype'])); ?>)
-                    </a>
-                </section>
-            <?php else:
-                $download_meta = get_post_meta(get_the_ID(), 'lesson_downloads', true);
-                if (!empty($download_meta)):
-                    $dlines = explode("\n", $download_meta);
-                    ?>
-                    <section class="lesson-resources lesson-downloads pd-fl-x2" aria-describedby="lesson-downloads-heading">
-                        <h2 class="heading" id="lesson-downloads-heading">Downloadable Resources</h2>
-                        <ul class="download-list">
-                        <?php
-                        foreach ($dlines as $dline) {
-                            $dline = trim($dline);
-                            if (empty($dline)) continue;
-                                $parts = explode('|', $dline);
-                                $title = trim($parts[0]);
-                                $url = isset($parts[1]) ? trim($parts[1]) : '';
-                                if (empty($url)) continue;
-                                echo '<li><a href="' . esc_url($url) . '" class="button download-button" download>' . esc_html($title) . '</a></li>';
-                            }
-                            ?>
-                        </ul>
-                    </section>
+    // Downloadable Assets - use newline meta saved by the Downloads meta box (`lesson_downloads`).
+    $download_meta = get_post_meta(get_the_ID(), 'lesson_downloads', true);
+    if (!empty($download_meta)):
+        $dlines = explode("\n", $download_meta);
+        ?>
+        <section class="lesson-resources lesson-downloads pd-fl-x2" aria-describedby="lesson-downloads-heading">
+            <h2 class="heading" id="lesson-downloads-heading">Downloadable Resources</h2>
+            <ul class="download-list">
                 <?php
-                endif;
-            endif; ?>
+                foreach ($dlines as $dline) {
+                    $dline = trim($dline);
+                    if (empty($dline))
+                        continue;
+                    $parts = explode('|', $dline);
+                    $title = trim($parts[0]);
+                    $url = isset($parts[1]) ? trim($parts[1]) : '';
+                    if (empty($url))
+                        continue;
+                    echo '<li><a href="' . esc_url($url) . '" class="button download-button" download>' . esc_html($title) . '</a></li>';
+                }
+                ?>
+            </ul>
+        </section>
+    <?php endif; ?>
 </main><!-- #primary -->
 
 <?php

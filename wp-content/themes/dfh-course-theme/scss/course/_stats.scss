@@ -1,0 +1,14 @@
+.stat {
+    display: flex;
+    font-size: 2em;
+    gap: 1rem;
+}
+
+.stat-label {
+    font-weight: bold;
+}
+
+.stat-value {
+    color: var(--ui-color-foreground-accent);
+    font-family: var(--typography-font-family-display);
+}
