@@ -15,6 +15,7 @@
 // -----------
 // Title row: badge + title
 .lesson-title {
+    align-items: center;
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
@@ -24,7 +25,8 @@
 .lesson-code-badge {
     background-color: var(--ui-color-foreground-base);
     color: var(--ui-color-background-base);
-    padding-inline: 0.25em;
+    padding-inline: 0.5em;
+    font-size: 0.66em;
 }
 
 
