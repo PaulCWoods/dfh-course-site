@@ -34,6 +34,7 @@ get_header();
             <div class="lesson-video">
                 <div class="lesson-video-container ct">
                     <mux-player playback-id="<?php echo esc_attr($playback_id); ?>"
+                        accent-color="#2eab93"
                         metadata-video-title="<?php echo esc_attr(get_the_title()); ?>" style="width:100%;height:auto;">
                     </mux-player>
                 </div>
@@ -41,7 +42,7 @@ get_header();
         <?php endif; ?>
         <div class="lesson-content pd-fl-x2">
 
-        
+
             <div class="ct lesson-main">
                 <div class="lesson-body prose">
                     <?php
