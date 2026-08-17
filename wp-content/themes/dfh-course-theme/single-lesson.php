@@ -41,6 +41,7 @@ get_header();
         <?php endif; ?>
         <div class="lesson-content pd-fl-x2">
 
+        
             <div class="ct lesson-main">
                 <div class="lesson-body prose">
                     <?php
