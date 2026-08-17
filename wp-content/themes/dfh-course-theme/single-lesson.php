@@ -54,7 +54,7 @@ get_header();
                     $slines = explode("\n", $stats_meta);
                     ?>
                     <aside class="lesson-stats">
-                        <h2>Lesson statistics</h2>
+                        <h2 class="sr">Lesson statistics</h2>
                         <dl class="lesson-stats-list">
                             <?php foreach ($slines as $sline) {
                                 $sline = trim($sline);
@@ -63,9 +63,10 @@ get_header();
                                 $parts = explode('|', $sline);
                                 $label = trim($parts[0]);
                                 $value = isset($parts[1]) ? trim($parts[1]) : '';
+                                $pc = isset($parts[2]) ? trim($parts[2]) : '';
                                 if ($label === '' && $value === '')
                                     continue;
-                                echo '<div class="stat">';
+                                echo '<div class="stat" ' . ($pc ? 'style="--stat-progress:' . esc_attr($pc) . ';" data-pc="' . esc_attr($pc) . '"' : '') . '>';
                                 echo '<dt class="stat-label">' . esc_html($label) . '</dt>';
                                 echo '<dd class="stat-value">' . esc_html($value) . '</dd>';
                                 echo '</div>';
