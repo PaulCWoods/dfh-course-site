@@ -1,8 +1,11 @@
 <?php
 get_header();
 
-// Fetch the roots selected in ACF
-$root_lessons = get_field('course_root_lessons');
+// Fetch the roots selected in ACF (safe when ACF is not active)
+$root_lessons = function_exists('get_field') ? get_field('course_root_lessons') : get_post_meta(get_the_ID(), 'course_root_lessons', true);
+if (!$root_lessons) {
+    $root_lessons = array();
+}
 
 ?>
 

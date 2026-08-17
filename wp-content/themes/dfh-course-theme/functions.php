@@ -247,6 +247,102 @@ function dfh_save_lesson_links_meta($post_id)
 }
 add_action('save_post', 'dfh_save_lesson_links_meta');
 
+/**
+ * Register meta box for downloadable assets (simple textarea: one per line Title | URL)
+ */
+function dfh_add_lesson_downloads_meta_box()
+{
+    add_meta_box(
+        'dfh_lesson_downloads_box',
+        'Lesson Downloadable Assets',
+        'dfh_render_downloads_meta_box_html',
+        'lesson',
+        'normal',
+        'high'
+    );
+}
+add_action('add_meta_boxes', 'dfh_add_lesson_downloads_meta_box');
+
+function dfh_render_downloads_meta_box_html($post)
+{
+    wp_nonce_field('dfh_save_downloads_meta', 'dfh_downloads_nonce');
+
+    $downloads = get_post_meta($post->ID, 'lesson_downloads', true);
+    ?>
+    <div style="margin-bottom: 10px;">
+        <label style="display: block; font-weight: 600; margin-bottom: 5px;">Downloads (one per line: Title | URL):</label>
+        <textarea name="lesson_downloads" rows="4" style="width: 100%; padding: 8px;" placeholder="Workbook | https://example.com/workbook.pdf"><?php echo esc_textarea($downloads); ?></textarea>
+        <p style="font-size: 12px; color: #666; margin-top: 5px;">Each line should contain a title, a pipe, then the URL.</p>
+    </div>
+    <?php
+}
+
+function dfh_save_lesson_downloads_meta($post_id)
+{
+    if (!isset($_POST['dfh_downloads_nonce']) || !wp_verify_nonce($_POST['dfh_downloads_nonce'], 'dfh_save_downloads_meta')) {
+        return;
+    }
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+    if (!current_user_can('edit_post', $post_id)) {
+        return;
+    }
+
+    if (isset($_POST['lesson_downloads'])) {
+        update_post_meta($post_id, 'lesson_downloads', sanitize_textarea_field($_POST['lesson_downloads']));
+    }
+}
+add_action('save_post', 'dfh_save_lesson_downloads_meta');
+
+/**
+ * Register meta box for lesson stats (one per line: Label | Value)
+ */
+function dfh_add_lesson_stats_meta_box()
+{
+    add_meta_box(
+        'dfh_lesson_stats_box',
+        'Lesson Stats',
+        'dfh_render_stats_meta_box_html',
+        'lesson',
+        'side',
+        'default'
+    );
+}
+add_action('add_meta_boxes', 'dfh_add_lesson_stats_meta_box');
+
+function dfh_render_stats_meta_box_html($post)
+{
+    wp_nonce_field('dfh_save_stats_meta', 'dfh_stats_nonce');
+
+    $stats = get_post_meta($post->ID, 'lesson_stats', true);
+    ?>
+    <div style="margin-bottom: 10px;">
+        <label style="display: block; font-weight: 600; margin-bottom: 5px;">Lesson Stats (one per line: Label | Value):</label>
+        <textarea name="lesson_stats" rows="4" style="width: 100%; padding: 8px;" placeholder="Students | 120"><?php echo esc_textarea($stats); ?></textarea>
+        <p style="font-size: 12px; color: #666; margin-top: 5px;">Each line should contain a label, a pipe, then the number/value.</p>
+    </div>
+    <?php
+}
+
+function dfh_save_lesson_stats_meta($post_id)
+{
+    if (!isset($_POST['dfh_stats_nonce']) || !wp_verify_nonce($_POST['dfh_stats_nonce'], 'dfh_save_stats_meta')) {
+        return;
+    }
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+    if (!current_user_can('edit_post', $post_id)) {
+        return;
+    }
+
+    if (isset($_POST['lesson_stats'])) {
+        update_post_meta($post_id, 'lesson_stats', sanitize_textarea_field($_POST['lesson_stats']));
+    }
+}
+add_action('save_post', 'dfh_save_lesson_stats_meta');
+
 
 /**
  * -------------------------------------------------------------------------
@@ -262,66 +358,10 @@ if (function_exists('acf_add_local_field_group')) {
     acf_add_local_field_group(array(
         'key' => 'group_lesson_details',
         'title' => 'Lesson Meta & Content',
-        'fields' => array(
-            // (Removed) Video URL Field — replaced by Mux meta box `mux_playback_id`.
-            // Stats Repeater Field
-            array(
-                'key' => 'field_lesson_stats',
-                'label' => 'Lesson Stats',
-                'name' => 'lesson_stats',
-                'type' => 'repeater',
-                'instructions' => 'Add key metrics or stats to display nicely alongside the lesson.',
-                'button_label' => 'Add Stat',
-                'layout' => 'table',
-                'sub_fields' => array(
-                    array(
-                        'key' => 'field_stat_label',
-                        'label' => 'Label',
-                        'name' => 'stat_label',
-                        'type' => 'text',
-                    ),
-                    array(
-                        'key' => 'field_stat_value',
-                        'label' => 'Value/Number',
-                        'name' => 'stat_value',
-                        'type' => 'text',
-                    ),
-                ),
-            ),
-            // Useful Links Repeater Field
-            array(
-                'key' => 'field_lesson_links',
-                'label' => 'Useful Links',
-                'name' => 'lesson_links',
-                'type' => 'repeater',
-                'instructions' => 'Add external resources or reference links for this lesson.',
-                'button_label' => 'Add Link',
-                'layout' => 'row',
-                'sub_fields' => array(
-                    array(
-                        'key' => 'field_link_title',
-                        'label' => 'Link Title',
-                        'name' => 'link_title',
-                        'type' => 'text',
-                    ),
-                    array(
-                        'key' => 'field_link_url',
-                        'label' => 'URL',
-                        'name' => 'link_url',
-                        'type' => 'url',
-                    ),
-                ),
-            ),
-            // Downloads File Field
-            array(
-                'key' => 'field_lesson_downloads',
-                'label' => 'Downloadable Assets',
-                'name' => 'lesson_downloads',
-                'type' => 'file',
-                'instructions' => 'Upload a PDF, workbook, or exercise file for students.',
-                'return_format' => 'array',
-            ),
-        ),
+        // Fields for stats and downloads have moved to custom meta-boxes
+        // (dfh_lesson_stats_box, dfh_lesson_downloads_box) to avoid ACF
+        // plugin dependency. Keep the group intentionally lightweight.
+        'fields' => array(),
         'location' => array(
             array(
                 array(
