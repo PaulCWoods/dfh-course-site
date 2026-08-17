@@ -1,1 +1,33 @@
-// TODO Lesson-specific styles
+.site-main.lesson {
+    padding: 0;
+}
+
+:is(.lesson-header, .lesson-video) {
+    background-color: var(--ui-color-background-base);
+    color: var(--ui-color-foreground-base);
+    color-scheme: dark;
+}
+
+.lesson-title {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+}
+
+.lesson-code-badge {
+    background-color: var(--ui-color-foreground-base);
+    color: var(--ui-color-background-base);
+    padding-inline: 0.25em;
+}
+
+.lesson-video-container {
+    font-size: 0;
+}
+
+.lesson-title {
+    margin-block-end: 0;
+}
+
+.lesson-resources-section {
+    border-block-start: var(--ui-border);
+}

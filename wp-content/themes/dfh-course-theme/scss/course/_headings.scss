@@ -1,0 +1,13 @@
+.heading {
+    font-size: var(--ui-typography-heading-font-size);
+    font-family: var(--ui-typography-heading-font-family);
+    font-weight: var(--ui-typography-heading-font-weight);
+    line-height: var(--ui-typography-heading-line-height);
+}
+
+.subheading {
+    font-size: var(--ui-typography-subheading-font-size);
+    font-family: var(--ui-typography-subheading-font-family);
+    font-weight: var(--ui-typography-subheading-font-weight);
+    line-height: var(--ui-typography-subheading-line-height);
+}
