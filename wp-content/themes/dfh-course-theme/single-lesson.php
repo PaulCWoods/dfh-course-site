@@ -62,7 +62,7 @@ get_header();
                                         $slines = explode("\n", $stats_meta);
                                         ?>
                                         <section class="lesson-resources lesson-stats" aria-describedby="lesson-stats-heading">
-                                            <h2 class="heading lesson-stats-heading" id="lesson-stats-heading">Key statistics</h2>
+                                            <h2 class="subheading lesson-resources-heading" id="lesson-stats-heading">Key statistics</h2>
                                             <dl class="lesson-stats-list">
                                                 <?php foreach ($slines as $sline) {
                                                     $sline = trim($sline);
@@ -88,7 +88,7 @@ get_header();
                                         ?>
                                         <section class="lesson-resources lesson-links" aria-describedby="lesson-links-heading">
                                             <div class="ct">
-                                                <h2 class="heading" id="lesson-links-heading">Further reading & links</h2>
+                                                <h2 class="subheading lesson-resources-heading" id="lesson-links-heading">Further reading & links</h2>
                                                 <ul class="resource-list">
                                                     <?php
                                                     $lines = explode("\n", $external_links);
