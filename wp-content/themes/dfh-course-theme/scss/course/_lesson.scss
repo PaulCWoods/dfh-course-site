@@ -143,7 +143,7 @@ $lesson-bp: 60em;
     align-self: start;
     grid-column: 1 / -1;
     position: sticky;
-    inset-block-start: var(--lesson-aside-sticky-top, var(--spacing-4));
+    inset-block-start: calc(var(--lesson-aside-sticky-top, var(--spacing-4)) + var(--spacing-1));
 
     @media screen and (width > #{$lesson-bp}) {
         grid-column: span 1; // occupy the third column on wide screens
