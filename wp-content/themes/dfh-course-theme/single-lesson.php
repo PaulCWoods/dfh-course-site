@@ -10,7 +10,7 @@ get_header();
 ?>
 
     <header class="lesson-head site-header" aria-label="Lesson navigation">
-        <nav class="ct lesson-nav">
+        <nav class="container lesson-nav">
         <?php
         $post_id = get_the_ID();
         $parent_id = wp_get_post_parent_id($post_id);
@@ -78,7 +78,7 @@ get_header();
     <article id="post-<?php the_ID(); ?>" <?php post_class('lesson-article'); ?>>
 
         <header class="lesson-header prose">
-            <div class="ct">
+            <div class="container">
                 <h1 class="lesson-title">
                     <?php
                     $lesson_code = dfh_get_lesson_hierarchy_number();
@@ -96,7 +96,7 @@ get_header();
         $playback_id = get_post_meta(get_the_ID(), 'mux_playback_id', true);
         if ($playback_id): ?>
             <div class="lesson-video">
-                <div class="lesson-video-container ct">
+                <div class="lesson-video-container container">
                     <mux-player playback-id="<?php echo esc_attr($playback_id); ?>"
                         accent-color="#2eab93"
                         metadata-video-title="<?php echo esc_attr(get_the_title()); ?>" style="width:100%;height:auto;">
@@ -107,7 +107,7 @@ get_header();
         <div class="lesson-content pd-fl-x2">
 
 
-            <div class="ct lesson-main">
+            <div class="container lesson-main">
                 <div class="lesson-body prose">
                     <?php
                     the_content();
@@ -151,7 +151,7 @@ get_header();
                                     if (!empty($external_links)):
                                         ?>
                                         <section class="lesson-resources lesson-links" aria-describedby="lesson-links-heading">
-                                            <div class="ct">
+                                            <div class="container">
                                                 <h2 class="subheading lesson-resources-heading" id="lesson-links-heading">Further reading & links</h2>
                                                 <ul class="resource-list">
                                                     <?php

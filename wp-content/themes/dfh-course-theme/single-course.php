@@ -12,7 +12,7 @@ if (!$root_lessons) {
 <header class="site-header">
     <div class="container">
         <nav class="site-navigation">
-            <ul class="site-breadcrumb ct">
+            <ul class="site-breadcrumb container">
                 <li><a href="https://designforhumans.blog" class="link site-title">Design For Humans</a></li>
                 <li><a href="<?php echo esc_url( home_url( '/courses' )); ?>" class="nav-link link">Courses</a></li>
             </ul>
