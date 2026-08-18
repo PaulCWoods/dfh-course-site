@@ -9,6 +9,16 @@ if (!$root_lessons) {
 
 ?>
 
+<header class="site-header">
+    <div class="container">
+        <nav class="site-navigation">
+            <ul class="site-breadcrumb ct">
+                <li><a href="https://designforhumans.blog" class="link site-title">Design For Humans</a></li>
+                <li><a href="<?php echo esc_url( home_url( '/courses' )); ?>" class="nav-link link">Courses</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
 <main class="course-landing site-main">
     <header>
         <h1><?php the_title(); ?></h1>

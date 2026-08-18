@@ -5,8 +5,23 @@
     padding: 0;
 }
 
+// Navigation
+
+.lesson-head.site-header {
+    border-block-end: 0;
+}
+
+.lesson-nav {
+    display: flex;
+}
+
+.lesson-breadcrumb {
+    flex-grow: 1;
+    font-weight: bold;
+}
+
 // Shared surface for header and video areas
-:is(.lesson-header, .lesson-video) {
+:is(.lesson-head, .lesson-header, .lesson-video) {
     background-color: var(--ui-color-background-base);
     color: var(--ui-color-foreground-base);
     color-scheme: dark;
@@ -14,6 +29,12 @@
 
 // -----------
 // Title row: badge + title
+
+.lesson-header {
+    padding: var(--site-block-padding, var(--spacing-fluid-x2));
+    padding-block-start: 0;
+}
+
 .lesson-title {
     align-items: center;
     display: flex;

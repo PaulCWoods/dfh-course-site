@@ -9,11 +9,75 @@
 get_header();
 ?>
 
+    <header class="lesson-head site-header" aria-label="Lesson navigation">
+        <nav class="ct lesson-nav">
+        <?php
+        $post_id = get_the_ID();
+        $parent_id = wp_get_post_parent_id($post_id);
 
+        // Breadcrumb: parent lesson when available; otherwise try to find parent Course
+        if ($parent_id) : ?>
+            <a class="lesson-breadcrumb link" href="<?php echo esc_url(get_permalink($parent_id)); ?>"><?php echo esc_html(get_the_title($parent_id)); ?></a>
+        <?php else:
+            // Attempt to find a Course that references this lesson as a root (ACF or postmeta)
+            $course_id = null;
+            $courses = get_posts(array(
+                'post_type' => 'course',
+                'posts_per_page' => 1,
+                'meta_query' => array(
+                    array('key' => 'course_root_lessons', 'value' => '"' . $post_id . '"', 'compare' => 'LIKE'),
+                ),
+            ));
+            if ($courses) {
+                $course_id = $courses[0]->ID;
+            }
+
+            if ($course_id) : ?>
+                <a class="lesson-breadcrumb link" href="<?php echo esc_url(get_permalink($course_id)); ?>"><?php echo esc_html(get_the_title($course_id)); ?></a>
+            <?php else: ?>
+                <a class="lesson-breadcrumb link" href="<?php echo esc_url(home_url()); ?>">Home</a>
+            <?php endif;
+        endif; ?>
+
+        <!-- Syllabus overlay toggle -->
+        <button class="syllabus-toggle" command="toggle-popover" commandfor="lesson-syllabus-panel">Open course navigation</button>
+
+    </nav>
+
+    </header>
 <main id="primary" class="site-main lesson">
+<!-- Syllabus overlay panel (hidden by default) -->
+    <div id="lesson-syllabus-panel" class="lesson-syllabus-panel syllabus-panel" popover>
+        <button class="syllabus-close" command="hide-popover" commandfor="lesson-syllabus-panel">Close navigation</button>
+        <nav class="syllabus-nav" aria-label="Course syllabus">
+            <ul class="syllabus-list">
+                <?php
+                // If we have a course, render its selected roots; otherwise render top-level lessons
+                if (empty($course_id)) {
+                    $top_roots = get_posts(array('post_type' => 'lesson', 'post_parent' => 0, 'posts_per_page' => -1, 'orderby' => 'menu_order title', 'order' => 'ASC'));
+                    foreach ($top_roots as $root) {
+                        echo '<li><a href="' . esc_url(get_permalink($root->ID)) . '">' . esc_html(get_the_title($root->ID)) . '</a>';
+                        echo dfh_render_lesson_children($root->ID);
+                        echo '</li>';
+                    }
+                } else {
+                    // Try ACF first, otherwise postmeta (expects array of IDs)
+                    $roots = function_exists('get_field') ? get_field('course_root_lessons', $course_id) : get_post_meta($course_id, 'course_root_lessons', true);
+                    if (!empty($roots) && is_array($roots)) {
+                        foreach ($roots as $r) {
+                            echo '<li><a href="' . esc_url(get_permalink($r)) . '">' . esc_html(get_the_title($r)) . '</a>';
+                            echo dfh_render_lesson_children($r);
+                            echo '</li>';
+                        }
+                    }
+                }
+                ?>
+            </ul>
+        </nav>
+    </div>
     <article id="post-<?php the_ID(); ?>" <?php post_class('lesson-article'); ?>>
 
-        <header class="lesson-header prose pd-fl-x2">
+        <header class="lesson-header prose">
             <div class="ct">
                 <h1 class="lesson-title">
                     <?php

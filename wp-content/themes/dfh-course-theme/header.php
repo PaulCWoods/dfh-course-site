@@ -15,13 +15,3 @@
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 <div class="site">
-<header class="site-header">
-    <div class="container">
-        <nav class="site-navigation">
-            <ul class="site-breadcrumb ct">
-                <li><a href="https://designforhumans.blog" class="link site-title">Design For Humans</a></li>
-                <li><a href="<?php echo esc_url( home_url( '/courses' )); ?>" class="nav-link link">Courses</a></li>
-            </ul>
-        </nav>
-    </div>
-</header>
