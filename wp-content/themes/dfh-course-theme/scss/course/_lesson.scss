@@ -75,6 +75,8 @@ $lesson-bp: 60em;
 // Video container: collapse inline whitespace around <mux-player>
 
 .lesson-video {
+    padding-inline-start: calc(0px + env(safe-area-inset-left));
+    padding-inline-end: calc(0px + env(safe-area-inset-left));
     @media (width < #{$lesson-bp}) and (aspect-ratio < 1/1) {
         position: sticky;
         inset-block-start: var(--lesson-aside-sticky-top, var(--spacing-4));
