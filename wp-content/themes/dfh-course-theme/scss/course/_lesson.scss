@@ -42,6 +42,10 @@
 // Main and body
 
 // Main grid: content + optional side column for stats
+.lesson-content {
+    padding: var(--site-block-padding, var(--spacing-fluid-x2));
+}
+
 .lesson-main {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -50,7 +54,18 @@
 
 // Lesson body (article content)
 .lesson-body {
-    grid-column: 1 / -1;
+    grid-column: 1 / -1;    
+}
+
+:is(.lesson-body, .lesson-resources) {
+    border-block-end: var(--ui-border);
+    margin-block-end: var(--spacing-2);
+    padding-block-end: var(--spacing-2);
+    &:last-child {
+        border-block-end: none;
+        margin-block-end: 0;
+        padding-block-end: 0;
+    }
 }
 
 @media screen and (min-width: 60em) {
@@ -62,24 +77,24 @@
 // -----------
 // Resources
 
-// Resources (downloads, external links)
-.lesson-resources {
-    border-block-start: var(--ui-border);
-}
-
-
 // -----------
 // Stats
 
 // Stats column (renders as a definition list in markup)
-.lesson-stats {
+.lesson-aside {
+    align-self: start;
     grid-column: 1 / -1;
-}
+    position: sticky;
+    top: var(--lesson-aside-sticky-top, var(--spacing-4));
 
-@media screen and (min-width: 60em) {
-    .lesson-stats {
+    @media screen and (min-width: 60em) {
         grid-column: span 1; // occupy the third column on wide screens
     }
+}
+
+
+.lesson-stats-heading {
+    margin-block-end: var(--spacing-1);
 }
 
 // Stats list layout helper — default small-vertical list

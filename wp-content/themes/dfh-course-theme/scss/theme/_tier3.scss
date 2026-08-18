@@ -1,3 +1,4 @@
 :root {
+    --lesson-aside-sticky-top: calc(var(--site-block-padding) * 3 + 1rlh); // Calculate the top offset for sticky positioning of the lesson stats column, based on the height of the masthead plus extra padding.
     --prose-body-font-family: var(--ui-typography-body-font-family);
 }

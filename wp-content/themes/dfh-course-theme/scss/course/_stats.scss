@@ -1,6 +1,6 @@
 .stat {
     align-items: center;
-    background-color: var(--ui-color-background-fade);
+    background-color: var(--ui-color-background-surface);
     display: flex;
     gap: var(--spacing-1);
     justify-content: space-between;
@@ -11,7 +11,7 @@
 }
 
 .stat-label {
-    font-weight: bold;
+    opacity: var(--ui-opacity-muted, 0.8);
 }
 
 .stat-value {
