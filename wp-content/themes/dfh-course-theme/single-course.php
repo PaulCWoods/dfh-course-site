@@ -10,7 +10,7 @@ if (!$root_lessons) {
 ?>
 
 <header class="site-header">
-    <div class="container">
+    <div class="container site-header-inner">
         <nav class="site-navigation">
             <ul class="site-breadcrumb container">
                 <li><a href="https://designforhumans.blog" class="link site-title">Design For Humans</a></li>

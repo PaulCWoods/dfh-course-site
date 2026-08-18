@@ -1,19 +1,107 @@
 .syllabus-panel {
-    position: fixed;
     background: var(--ui-color-background-surface);
+    block-size: 100%;
+    box-shadow: var(--ui-shadow);
+    display: none;
+    flex-direction: column;
     inset-block-start: 0;
     inset-inline-end: 0;
     inset-inline-start: auto;
-    block-size: 100%;
     max-inline-size: 100%;
     padding: var(--site-block-padding, var(--spacing-fluid-x2));
     padding-inline-end: calc(var(--site-block-padding, var(--spacing-fluid-x2)) + env(safe-area-inset-left));
+    position: fixed;
+    transition:
+        translate var(--lesson-syllabus-transition),
+        display var(--lesson-syllabus-transition) allow-discrete,
+        overlay var(--lesson-syllabus-transition) allow-discrete;
+    translate: 100% 0;
+
+    &:popover-open {
+        display: flex;
+        translate: 0 0;
+
+        @starting-style {
+            translate: 100% 0;
+        }
+    }
+}
+
+.syllabus-panel-header {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.syllabus-panel-brand {
+    display: block;
+    font-family: var(--typography-font-family-display);
+    text-transform: uppercase;
+    font-size: 1.5em;
+    letter-spacing: -0.025em;
+    text-fit: grow;
 }
 
 .syllabus-nav {
+    flex-grow: 1;
     margin-block-start: 1rem;
 
     ul {
         list-style: none;
+
+        a {
+            align-items: center;
+            display: flex;
+            justify-content: space-between;
+
+            &.current {
+                color: var(--link-color);
+            }
+
+            @media (hover: hover) {
+                &:hover {
+                    color: var(--link-hover-color);
+                    text-decoration: none;
+                }
+            }
+
+            &:active {
+                color: var(--link-active-color);
+                text-decoration: none;
+            }
+
+            .chip {
+                font-size: 0.7em;
+            }
+        }
+    }
+}
+
+.item-label {
+    &:is(.module, .course) {
+        font-weight: var(--ui-typography-subheading-font-weight);
+        font-size: var(--ui-typography-subheading-font-size);
+    }
+
+    .item-label {
+        font-weight: var(--ui-typography-body-strong-font-weight);
+    }
+}
+
+.sub-lesson-list {
+    margin-block-end: 1rem;
+
+    .item-label {
+        font-weight: var(--ui-typography-body-strong-font-weight);
+    }
+
+    ul {
+        padding-inline-start: 1rem;
+        margin-block-end: 1rem;
+
+        .item-label {
+            font-weight: var(--ui-typography-body-font-weight);
+        }
     }
 }

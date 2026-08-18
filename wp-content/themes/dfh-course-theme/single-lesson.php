@@ -58,9 +58,34 @@ get_header();
 </header>
 <main id="primary" class="site-main lesson">
     <!-- Syllabus overlay panel (hidden by default) -->
-    <div id="lesson-syllabus-panel" class="lesson-syllabus-panel syllabus-panel" popover>
-        <button class="syllabus-close button" command="hide-popover" commandfor="lesson-syllabus-panel">Close
-            navigation</button>
+    <aside id="lesson-syllabus-panel" class="lesson-syllabus-panel syllabus-panel" popover>
+        <header class="syllabus-panel-header">
+            <?php
+            // Prefer the earlier discovered $course_id, otherwise try to locate a course that lists this lesson as a root
+            $panel_course_id = isset($course_id) && $course_id ? $course_id : null;
+            if (empty($panel_course_id)) {
+                $possible = get_posts(array(
+                    'post_type' => 'course',
+                    'posts_per_page' => 1,
+                    'meta_query' => array(
+                        array('key' => 'course_root_lessons', 'value' => '"' . get_the_ID() . '"', 'compare' => 'LIKE'),
+                    ),
+                ));
+                if ($possible) {
+                    $panel_course_id = $possible[0]->ID;
+                }
+            }
+
+            if ($panel_course_id): ?>
+                <a class="link syllabus-course" href="<?php echo esc_url(get_permalink($panel_course_id)); ?>"><?php echo esc_html(get_the_title($panel_course_id)); ?></a>
+            <?php else: ?>
+                <a class="link syllabus-course" href="<?php echo esc_url(home_url()); ?>">Design for Humans</a>
+            <?php endif; ?>
+
+            <button class="syllabus-close button" command="hide-popover" commandfor="lesson-syllabus-panel">
+                Close navigation
+            </button>
+        </header>
         <nav class="syllabus-nav" aria-label="Course syllabus">
             <ul class="syllabus-list">
                 <?php
@@ -68,7 +93,9 @@ get_header();
                 if (empty($course_id)) {
                     $top_roots = get_posts(array('post_type' => 'lesson', 'post_parent' => 0, 'posts_per_page' => -1, 'orderby' => 'menu_order title', 'order' => 'ASC'));
                     foreach ($top_roots as $root) {
-                        echo '<li><a href="' . esc_url(get_permalink($root->ID)) . '">' . esc_html(get_the_title($root->ID)) . '</a>';
+                        $is_current = ($root->ID === get_the_ID());
+                        $link_class = $is_current ? ' class="current"' : '';
+                        echo '<li><a' . $link_class . ' href="' . esc_url(get_permalink($root->ID)) . '"><span class="item-label module">' . esc_html(get_the_title($root->ID)) . '</span> <span class="chip">Complete</span></a>';
                         echo dfh_render_lesson_children($root->ID);
                         echo '</li>';
                     }
@@ -77,8 +104,11 @@ get_header();
                     $roots = function_exists('get_field') ? get_field('course_root_lessons', $course_id) : get_post_meta($course_id, 'course_root_lessons', true);
                     if (!empty($roots) && is_array($roots)) {
                         foreach ($roots as $r) {
-                            echo '<li><a href="' . esc_url(get_permalink($r)) . '">' . esc_html(get_the_title($r)) . '</a>';
-                            echo dfh_render_lesson_children($r);
+                            $r_id = is_object($r) ? $r->ID : (int) $r;
+                            $is_current = ($r_id === get_the_ID());
+                            $link_class = $is_current ? ' class="current"' : '';
+                            echo '<li><a' . $link_class . ' href="' . esc_url(get_permalink($r_id)) . '"><span class="item-label module">' . esc_html(get_the_title($r_id)) . '</span> <span class="chip">Complete</span></a>';
+                            echo dfh_render_lesson_children($r_id);
                             echo '</li>';
                         }
                     }
@@ -86,7 +116,12 @@ get_header();
                 ?>
             </ul>
         </nav>
-    </div>
+        <footer>
+            <span class="syllabus-panel-brand">
+                Design for Humans
+            </span>
+        </footer>
+    </aside>
     <article id="post-<?php the_ID(); ?>" <?php post_class('lesson-article'); ?>>
 
         <header class="lesson-header prose">

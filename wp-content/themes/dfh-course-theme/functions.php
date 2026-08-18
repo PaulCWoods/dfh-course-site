@@ -518,7 +518,9 @@ function dfh_render_lesson_children($parent_id)
 
     $output = '<ul class="sub-lesson-list">';
     foreach ($children as $child) {
-        $output .= '<li><a href="' . get_permalink($child->ID) . '">' . get_the_title($child->ID) . '</a>';
+        $is_current = ($child->ID === get_the_ID());
+        $link_class = $is_current ? ' class="current"' : '';
+        $output .= '<li><a '.$link_class.' href="' . get_permalink($child->ID) . '"><span class="item-label lesson">' . get_the_title($child->ID) . '</span> <span class="chip">Complete</span></a>';
         $output .= dfh_render_lesson_children($child->ID); // Recursion
         $output .= '</li>';
     }
