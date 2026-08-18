@@ -59,7 +59,7 @@ get_header();
 <main id="primary" class="site-main lesson">
     <!-- Syllabus overlay panel (hidden by default) -->
     <div id="lesson-syllabus-panel" class="lesson-syllabus-panel syllabus-panel" popover>
-        <button class="syllabus-close" command="hide-popover" commandfor="lesson-syllabus-panel">Close
+        <button class="syllabus-close button" command="hide-popover" commandfor="lesson-syllabus-panel">Close
             navigation</button>
         <nav class="syllabus-nav" aria-label="Course syllabus">
             <ul class="syllabus-list">

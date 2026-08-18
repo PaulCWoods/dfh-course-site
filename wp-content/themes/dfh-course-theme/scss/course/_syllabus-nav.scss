@@ -6,5 +6,14 @@
     inset-inline-start: auto;
     block-size: 100%;
     max-inline-size: 100%;
-    padding: var(--spacing-fluid);
+    padding: var(--site-block-padding, var(--spacing-fluid-x2));
+    padding-inline-end: calc(var(--site-block-padding, var(--spacing-fluid-x2)) + env(safe-area-inset-left));
+}
+
+.syllabus-nav {
+    margin-block-start: 1rem;
+
+    ul {
+        list-style: none;
+    }
 }
