@@ -59,7 +59,9 @@ $lesson-bp: 60em;
 // Title row: badge + title
 
 .lesson-header {
-    padding: var(--site-block-padding, var(--spacing-fluid-x2));
+    padding-block: var(--site-block-padding, var(--spacing-fluid-x2));
+    padding-inline-start: calc(var(--site-block-padding, var(--spacing-fluid-x2)) + env(safe-area-inset-left));
+    padding-inline-end: calc(var(--site-block-padding, var(--spacing-fluid-x2)) + env(safe-area-inset-left));
 }
 
 .lesson-title {
@@ -96,7 +98,9 @@ $lesson-bp: 60em;
 
 // Main grid: content + optional side column for stats
 .lesson-content {
-    padding: var(--site-block-padding, var(--spacing-fluid-x2));
+    padding-block: var(--site-block-padding, var(--spacing-fluid-x2));
+    padding-inline-start: calc(var(--site-block-padding, var(--spacing-fluid-x2)) + env(safe-area-inset-left));
+    padding-inline-end: calc(var(--site-block-padding, var(--spacing-fluid-x2)) + env(safe-area-inset-left));
 }
 
 .lesson-main {
