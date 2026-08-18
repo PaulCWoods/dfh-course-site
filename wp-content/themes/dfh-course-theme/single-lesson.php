@@ -110,7 +110,7 @@ get_header();
                 </div>
             </div>
         <?php endif; ?>
-        <div class="lesson-content pd-fl-x2">
+        <div class="lesson-content">
 
 
             <div class="container lesson-main">
