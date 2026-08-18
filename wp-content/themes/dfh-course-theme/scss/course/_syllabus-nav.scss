@@ -8,20 +8,31 @@
     inset-inline-end: 0;
     inset-inline-start: auto;
     max-inline-size: 100%;
+    opacity: 0;
     padding: var(--site-block-padding, var(--spacing-fluid-x2));
     padding-inline-end: calc(var(--site-block-padding, var(--spacing-fluid-x2)) + env(safe-area-inset-left));
     position: fixed;
     transition:
-        translate var(--lesson-syllabus-transition),
-        display var(--lesson-syllabus-transition) allow-discrete,
-        overlay var(--lesson-syllabus-transition) allow-discrete;
+        opacity var(--lesson-syllabus-transition),
+        display var(--lesson-syllabus-transition) allow-discrete;
     translate: 100% 0;
+
+    @supports (overlay: auto) {
+        transition:
+            opacity var(--lesson-syllabus-transition),
+            translate var(--lesson-syllabus-transition),
+            display var(--lesson-syllabus-transition) allow-discrete,
+            overlay var(--lesson-syllabus-transition) allow-discrete;
+        translate: 100% 0;
+    }
 
     &:popover-open {
         display: flex;
+        opacity: 1;
         translate: 0 0;
 
         @starting-style {
+            opacity: 0;
             translate: 100% 0;
         }
     }
