@@ -9,46 +9,58 @@
 get_header();
 ?>
 
-    <header class="lesson-head site-header" aria-label="Lesson navigation">
-        <nav class="container lesson-nav">
+<header class="lesson-head site-header" aria-label="Lesson navigation">
+    <div class="lesson-head-inner container">
+        <nav class="lesson-nav">
+            <?php
+            $post_id = get_the_ID();
+            $parent_id = wp_get_post_parent_id($post_id);
+
+            // Breadcrumb: parent lesson when available; otherwise try to find parent Course
+            if ($parent_id): ?>
+                <a class="lesson-breadcrumb link"
+                    href="<?php echo esc_url(get_permalink($parent_id)); ?>"><?php echo esc_html(get_the_title($parent_id)); ?></a>
+            <?php else:
+                // Attempt to find a Course that references this lesson as a root (ACF or postmeta)
+                $course_id = null;
+                $courses = get_posts(array(
+                    'post_type' => 'course',
+                    'posts_per_page' => 1,
+                    'meta_query' => array(
+                        array('key' => 'course_root_lessons', 'value' => '"' . $post_id . '"', 'compare' => 'LIKE'),
+                    ),
+                ));
+                if ($courses) {
+                    $course_id = $courses[0]->ID;
+                }
+
+                if ($course_id): ?>
+                    <a class="lesson-breadcrumb link"
+                        href="<?php echo esc_url(get_permalink($course_id)); ?>"><?php echo esc_html(get_the_title($course_id)); ?></a>
+                <?php else: ?>
+                    <a class="lesson-breadcrumb link" href="<?php echo esc_url(home_url()); ?>">Home</a>
+                <?php endif;
+            endif; ?>
+
+            <!-- Syllabus overlay toggle -->
+
+        </nav>
         <?php
-        $post_id = get_the_ID();
-        $parent_id = wp_get_post_parent_id($post_id);
+        $lesson_code = dfh_get_lesson_hierarchy_number();
+        if ($lesson_code):
+            ?>
+            <span class="lesson-code-badge" title="Lesson code"><span class="sr">Lesson code:</span><?php echo esc_html($lesson_code); ?></span>
+        <?php endif; ?>
+        <button class="syllabus-toggle lesson-syllabus-toggle button" command="toggle-popover"
+            commandfor="lesson-syllabus-panel">Progress</button>
+    </div>
 
-        // Breadcrumb: parent lesson when available; otherwise try to find parent Course
-        if ($parent_id) : ?>
-            <a class="lesson-breadcrumb link" href="<?php echo esc_url(get_permalink($parent_id)); ?>"><?php echo esc_html(get_the_title($parent_id)); ?></a>
-        <?php else:
-            // Attempt to find a Course that references this lesson as a root (ACF or postmeta)
-            $course_id = null;
-            $courses = get_posts(array(
-                'post_type' => 'course',
-                'posts_per_page' => 1,
-                'meta_query' => array(
-                    array('key' => 'course_root_lessons', 'value' => '"' . $post_id . '"', 'compare' => 'LIKE'),
-                ),
-            ));
-            if ($courses) {
-                $course_id = $courses[0]->ID;
-            }
-
-            if ($course_id) : ?>
-                <a class="lesson-breadcrumb link" href="<?php echo esc_url(get_permalink($course_id)); ?>"><?php echo esc_html(get_the_title($course_id)); ?></a>
-            <?php else: ?>
-                <a class="lesson-breadcrumb link" href="<?php echo esc_url(home_url()); ?>">Home</a>
-            <?php endif;
-        endif; ?>
-
-        <!-- Syllabus overlay toggle -->
-        <button class="syllabus-toggle" command="toggle-popover" commandfor="lesson-syllabus-panel">Open course navigation</button>
-
-    </nav>
-
-    </header>
+</header>
 <main id="primary" class="site-main lesson">
-<!-- Syllabus overlay panel (hidden by default) -->
+    <!-- Syllabus overlay panel (hidden by default) -->
     <div id="lesson-syllabus-panel" class="lesson-syllabus-panel syllabus-panel" popover>
-        <button class="syllabus-close" command="hide-popover" commandfor="lesson-syllabus-panel">Close navigation</button>
+        <button class="syllabus-close" command="hide-popover" commandfor="lesson-syllabus-panel">Close
+            navigation</button>
         <nav class="syllabus-nav" aria-label="Course syllabus">
             <ul class="syllabus-list">
                 <?php
@@ -80,12 +92,7 @@ get_header();
         <header class="lesson-header prose">
             <div class="container">
                 <h1 class="lesson-title">
-                    <?php
-                    $lesson_code = dfh_get_lesson_hierarchy_number();
-                    if ($lesson_code):
-                        ?>
-                        <span class="lesson-code-badge"><?php echo esc_html($lesson_code); ?></span>
-                    <?php endif; ?>
+
                     <?php the_title(); ?>
                 </h1>
             </div>
@@ -97,8 +104,7 @@ get_header();
         if ($playback_id): ?>
             <div class="lesson-video">
                 <div class="lesson-video-container container">
-                    <mux-player playback-id="<?php echo esc_attr($playback_id); ?>"
-                        accent-color="#2eab93"
+                    <mux-player playback-id="<?php echo esc_attr($playback_id); ?>" accent-color="#2eab93"
                         metadata-video-title="<?php echo esc_attr(get_the_title()); ?>" style="width:100%;height:auto;">
                     </mux-player>
                 </div>
@@ -113,67 +119,71 @@ get_header();
                     the_content();
                     ?>
                 </div>
+                <?php
+                // Gather stats and external links; render aside only if either exists
+                $stats_meta = get_post_meta(get_the_ID(), 'lesson_stats', true);
+                $external_links = get_post_meta(get_the_ID(), 'lesson_external_links', true);
+
+                if (!empty($stats_meta) || !empty($external_links)): ?>
+                    <aside class="lesson-aside">
+                        <?php
+                        // Stats
+                        if (!empty($stats_meta)):
+                            $slines = explode("\n", $stats_meta);
+                            ?>
+                            <section class="lesson-resources lesson-stats" aria-describedby="lesson-stats-heading">
+                                <h2 class="subheading lesson-resources-heading" id="lesson-stats-heading">Key statistics</h2>
+                                <dl class="lesson-stats-list">
+                                    <?php foreach ($slines as $sline) {
+                                        $sline = trim($sline);
+                                        if (empty($sline))
+                                            continue;
+                                        $parts = explode('|', $sline);
+                                        $label = trim($parts[0]);
+                                        $value = isset($parts[1]) ? trim($parts[1]) : '';
+                                        $pc = isset($parts[2]) ? trim($parts[2]) : '';
+                                        if ($label === '' && $value === '')
+                                            continue;
+                                        ?>
+                                        <div class="stat" <?php echo ($pc ? 'style="--stat-progress:' . esc_attr($pc) . ';" data-pc="' . esc_attr($pc) . '"' : ''); ?>>
+                                            <dt class="stat-label"><?php echo esc_html($label); ?></dt>
+                                            <dd class="stat-value"><?php echo esc_html($value); ?></dd>
+                                        </div>
+                                    <?php } ?>
+                                </dl>
+                            </section>
                             <?php
-                            // Gather stats and external links; render aside only if either exists
-                            $stats_meta = get_post_meta(get_the_ID(), 'lesson_stats', true);
-                            $external_links = get_post_meta(get_the_ID(), 'lesson_external_links', true);
+                        endif;
 
-                            if (!empty($stats_meta) || !empty($external_links)) : ?>
-                                <aside class="lesson-aside">
-                                    <?php
-                                    // Stats
-                                    if (!empty($stats_meta)):
-                                        $slines = explode("\n", $stats_meta);
+                        // External links
+                        if (!empty($external_links)):
+                            ?>
+                            <section class="lesson-resources lesson-links" aria-describedby="lesson-links-heading">
+                                <div class="container">
+                                    <h2 class="subheading lesson-resources-heading" id="lesson-links-heading">Further reading &
+                                        links</h2>
+                                    <ul class="resource-list">
+                                        <?php
+                                        $lines = explode("\n", $external_links);
+                                        foreach ($lines as $line) {
+                                            $line = trim($line);
+                                            if (empty($line))
+                                                continue;
+                                            $parts = explode('|', $line);
+                                            $link_title = trim($parts[0]);
+                                            $link_url = isset($parts[1]) ? trim($parts[1]) : '#';
+                                            echo '<li><a href="' . esc_url($link_url) . '" target="_blank" class="link" rel="noopener noreferrer">' . esc_html($link_title) . '</a></li>';
+                                        }
                                         ?>
-                                        <section class="lesson-resources lesson-stats" aria-describedby="lesson-stats-heading">
-                                            <h2 class="subheading lesson-resources-heading" id="lesson-stats-heading">Key statistics</h2>
-                                            <dl class="lesson-stats-list">
-                                                <?php foreach ($slines as $sline) {
-                                                    $sline = trim($sline);
-                                                    if (empty($sline)) continue;
-                                                    $parts = explode('|', $sline);
-                                                    $label = trim($parts[0]);
-                                                    $value = isset($parts[1]) ? trim($parts[1]) : '';
-                                                    $pc = isset($parts[2]) ? trim($parts[2]) : '';
-                                                    if ($label === '' && $value === '') continue;
-                                                    ?>
-                                                    <div class="stat" <?php echo ($pc ? 'style="--stat-progress:' . esc_attr($pc) . ';" data-pc="' . esc_attr($pc) . '"' : ''); ?>>
-                                                        <dt class="stat-label"><?php echo esc_html($label); ?></dt>
-                                                        <dd class="stat-value"><?php echo esc_html($value); ?></dd>
-                                                    </div>
-                                                <?php } ?>
-                                            </dl>
-                                        </section>
-                                    <?php
-                                    endif;
-
-                                    // External links
-                                    if (!empty($external_links)):
-                                        ?>
-                                        <section class="lesson-resources lesson-links" aria-describedby="lesson-links-heading">
-                                            <div class="container">
-                                                <h2 class="subheading lesson-resources-heading" id="lesson-links-heading">Further reading & links</h2>
-                                                <ul class="resource-list">
-                                                    <?php
-                                                    $lines = explode("\n", $external_links);
-                                                    foreach ($lines as $line) {
-                                                        $line = trim($line);
-                                                        if (empty($line)) continue;
-                                                        $parts = explode('|', $line);
-                                                        $link_title = trim($parts[0]);
-                                                        $link_url = isset($parts[1]) ? trim($parts[1]) : '#';
-                                                        echo '<li><a href="' . esc_url($link_url) . '" target="_blank" class="link" rel="noopener noreferrer">' . esc_html($link_title) . '</a></li>';
-                                                    }
-                                                    ?>
-                                                </ul>
-                                            </div>
-                                        </section>
-                                    <?php
-                                    endif;
-                                    ?>
-                                </aside>
-                            <?php endif; ?>
-        </div>
+                                    </ul>
+                                </div>
+                            </section>
+                            <?php
+                        endif;
+                        ?>
+                    </aside>
+                <?php endif; ?>
+            </div>
         </div>
 
 
@@ -182,7 +192,7 @@ get_header();
 
     </article><!-- #post-<?php the_ID(); ?> -->
 
-    
+
 
     <?php
     // Downloadable Assets - use newline meta saved by the Downloads meta box (`lesson_downloads`).

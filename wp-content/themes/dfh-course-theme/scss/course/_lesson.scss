@@ -1,23 +1,51 @@
 // Lesson page — layout and small utilities
 
+$lesson-bp: 60em;
+
 // Root container
 .site-main.lesson {
     padding: 0;
 }
 
-// Navigation
+// Head and Navigation
 
 .lesson-head.site-header {
+    min-inline-size: 1px; // Needed to let the navigation link overflow ellipsis without breaking the layout.
     border-block-end: 0;
 }
 
-.lesson-nav {
+.lesson-head-inner {
+    align-items: center;
     display: flex;
+    gap: var(--spacing-1);
+    inline-size: 100%;
+}
+
+.lesson-code-badge {
+    align-self: stretch;
+    align-items: center;
+    color: var(--ui-color-background-base);
+    background-color: var(--ui-color-foreground-base);
+    display: flex;
+    font-size: var(--typography-font-size-upper-1);
+    font-weight: bold;
+    padding-inline: var(--spacing-fluid);
+}
+
+.lesson-nav {
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .lesson-breadcrumb {
     flex-grow: 1;
     font-weight: bold;
+}
+
+.lesson-syllabus-toggle {
+    padding: var(--spacing-05) var(--spacing-fluid);
 }
 
 // Shared surface for header and video areas
@@ -32,7 +60,6 @@
 
 .lesson-header {
     padding: var(--site-block-padding, var(--spacing-fluid-x2));
-    padding-block-start: 0;
 }
 
 .lesson-title {
@@ -43,16 +70,16 @@
     margin-block-end: 0; // keep title snug to content
 }
 
-.lesson-code-badge {
-    background-color: var(--ui-color-foreground-base);
-    color: var(--ui-color-background-base);
-    padding-inline: 0.5em;
-    font-size: 0.66em;
-}
-
 
 // -----------
 // Video container: collapse inline whitespace around <mux-player>
+
+.lesson-video {
+    @media (width < #{$lesson-bp}) and (aspect-ratio < 1/1) {
+        position: sticky;
+        inset-block-start: var(--lesson-aside-sticky-top, var(--spacing-4));
+    }
+}
 
 .lesson-video-container {
     font-size: 0;
@@ -80,7 +107,7 @@
     grid-column: 1 / -1;    
 }
 
-@media screen and (min-width: 60em) {
+@media screen and (width > #{$lesson-bp}) {
     .lesson-body {
         grid-column: span 2; // content spans two columns on wide screens
     }
@@ -109,9 +136,9 @@
     align-self: start;
     grid-column: 1 / -1;
     position: sticky;
-    top: var(--lesson-aside-sticky-top, var(--spacing-4));
+    inset-block-start: var(--lesson-aside-sticky-top, var(--spacing-4));
 
-    @media screen and (min-width: 60em) {
+    @media screen and (width > #{$lesson-bp}) {
         grid-column: span 1; // occupy the third column on wide screens
     }
 }
