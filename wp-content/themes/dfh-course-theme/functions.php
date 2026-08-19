@@ -547,3 +547,92 @@ function dfh_render_lesson_tree($roots = null, $level = 1)
     return $output;
 }
 
+
+/**
+ * STUDENT MANAGEMENT
+ */
+
+/**
+ * 1. Register Custom Student Role
+ */
+function dfh_add_student_role() {
+    add_role(
+        'course_student',
+        __( 'Course Student', 'dfh' ),
+        array(
+            'read'         => true,
+            'edit_posts'   => false,
+            'upload_files' => false,
+        )
+    );
+}
+add_action( 'init', 'dfh_add_student_role' );
+
+/**
+ * 2. Add Manual Enrollment Checkbox to User Profile Admin Screen
+ */
+function dfh_show_extra_user_profile_fields( $user ) {
+    // Only admins can change enrollment status
+    if ( ! current_user_can( 'administrator' ) ) {
+        return;
+    }
+    
+    $is_enrolled = get_user_meta( $user->ID, 'dfh_course_enrolled', true );
+    ?>
+    <h3>Course Access Control</h3>
+    <table class="form-table">
+        <tr>
+            <th><label for="dfh_course_enrolled">Course Enrollment</label></th>
+            <td>
+                <label>
+                    <input type="checkbox" name="dfh_course_enrolled" id="dfh_course_enrolled" value="1" <?php checked( $is_enrolled, '1' ); ?>>
+                    Grant access to Design for Humans course and lessons
+                </label>
+                <p class="description">Check this box to grant manual student access.</p>
+            </td>
+        </tr>
+    </table>
+    <?php
+}
+add_action( 'show_user_profile', 'dfh_show_extra_user_profile_fields' );
+add_action( 'edit_user_profile', 'dfh_show_extra_user_profile_fields' );
+
+/**
+ * 3. Save Enrollment Checkbox Data
+ */
+function dfh_save_extra_user_profile_fields( $user_id ) {
+    if ( ! current_user_can( 'edit_user', $user_id ) ) {
+        return;
+    }
+
+    if ( isset( $_POST['dfh_course_enrolled'] ) && '1' === $_POST['dfh_course_enrolled'] ) {
+        update_user_meta( $user_id, 'dfh_course_enrolled', '1' );
+    } else {
+        delete_user_meta( $user_id, 'dfh_course_enrolled' );
+    }
+}
+add_action( 'personal_options_update', 'dfh_save_extra_user_profile_fields' );
+add_action( 'edit_user_profile_update', 'dfh_save_extra_user_profile_fields' );
+
+/**
+ * 4. Helper Function: Check if User Has Access (With Admin Safety Override)
+ */
+function dfh_user_has_course_access( $user_id = 0 ) {
+    if ( ! $user_id ) {
+        $user_id = get_current_user_id();
+    }
+
+    // If user is not logged in, no access
+    if ( ! $user_id ) {
+        return false;
+    }
+
+    // SAFETY OVERRIDE: Administrators always have access so you never get locked out
+    if ( user_can( $user_id, 'administrator' ) ) {
+        return true;
+    }
+
+    // Check custom manual enrollment flag
+    $is_enrolled = get_user_meta( $user_id, 'dfh_course_enrolled', true );
+    return ( '1' === $is_enrolled );
+}

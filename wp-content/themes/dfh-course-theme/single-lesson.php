@@ -1,4 +1,22 @@
 <?php
+// Gate check at the very top of single-lesson.php or single-course.php
+if ( ! dfh_user_has_course_access() ) {
+    get_header();
+    ?>
+    <main class="restricted-access site-main">
+        <article class="article prose container">
+        <h1>Members Only Content</h1>
+        <p>You need to be enrolled in the course to view this lesson.</p>
+        <?php if ( ! is_user_logged_in() ) : ?>
+            <p><a href="<?php echo esc_url( wp_login_url( get_permalink() ) ); ?>" class="button">Log In</a></p>
+        <?php endif; ?>
+        </article> 
+    </main>
+    <?php
+    get_footer();
+    exit; // Stop loading the rest of the page
+}
+
 /**
  * Template Name: Single Lesson
  * Template Post Type: lesson
@@ -60,7 +78,7 @@ get_header();
     </div>
 
 </header>
-<main id="primary" class="site-main lesson">
+<main id="primary" class="site-main lesson-page">
     <!-- Syllabus overlay panel (hidden by default) -->
     <aside id="lesson-progress" class="lesson-progress progress-panel" popover>
         <?php
