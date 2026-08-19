@@ -11,6 +11,12 @@ get_header();
 
 <header class="lesson-head site-header" aria-label="Lesson navigation">
     <div class="lesson-head-inner container">
+        <?php
+        $lesson_code = dfh_get_lesson_hierarchy_number();
+        if ($lesson_code):
+            ?>
+            <span class="lesson-code-badge" title="Lesson code"><span class="sr">Lesson code:</span><?php echo esc_html($lesson_code); ?></span>
+        <?php endif; ?>
         <nav class="lesson-nav">
             <?php
             $post_id = get_the_ID();
@@ -23,15 +29,19 @@ get_header();
             <?php else:
                 // Attempt to find a Course that references this lesson as a root (ACF or postmeta)
                 $course_id = null;
-                $courses = get_posts(array(
-                    'post_type' => 'course',
-                    'posts_per_page' => 1,
-                    'meta_query' => array(
-                        array('key' => 'course_root_lessons', 'value' => '"' . $post_id . '"', 'compare' => 'LIKE'),
-                    ),
-                ));
-                if ($courses) {
-                    $course_id = $courses[0]->ID;
+                $all_courses = get_posts(array('post_type' => 'course', 'posts_per_page' => -1, 'fields' => 'ids'));
+                if (!empty($all_courses)) {
+                    foreach ($all_courses as $c_id) {
+                        $roots = function_exists('get_field') ? get_field('course_root_lessons', $c_id) : get_post_meta($c_id, 'course_root_lessons', true);
+                        if (is_string($roots)) {
+                            $maybe = @unserialize($roots);
+                            if ($maybe !== false) $roots = $maybe;
+                        }
+                        if (!empty($roots) && in_array($post_id, (array) $roots)) {
+                            $course_id = $c_id;
+                            break;
+                        }
+                    }
                 }
 
                 if ($course_id): ?>
@@ -45,81 +55,73 @@ get_header();
             <!-- Syllabus overlay toggle -->
 
         </nav>
-        <?php
-        $lesson_code = dfh_get_lesson_hierarchy_number();
-        if ($lesson_code):
-            ?>
-            <span class="lesson-code-badge" title="Lesson code"><span class="sr">Lesson code:</span><?php echo esc_html($lesson_code); ?></span>
-        <?php endif; ?>
-        <button class="syllabus-toggle lesson-syllabus-toggle button" command="toggle-popover"
-            commandfor="lesson-syllabus-panel">Progress</button>
+        <button class="progress-toggle lesson-progress-toggle button" command="toggle-popover"
+            commandfor="lesson-progress">Progress</button>
     </div>
 
 </header>
 <main id="primary" class="site-main lesson">
     <!-- Syllabus overlay panel (hidden by default) -->
-    <aside id="lesson-syllabus-panel" class="lesson-syllabus-panel syllabus-panel" popover>
-        <header class="syllabus-panel-header">
-            <?php
-            // Prefer the earlier discovered $course_id, otherwise try to locate a course that lists this lesson as a root
-            $panel_course_id = isset($course_id) && $course_id ? $course_id : null;
-            if (empty($panel_course_id)) {
-                $possible = get_posts(array(
-                    'post_type' => 'course',
-                    'posts_per_page' => 1,
-                    'meta_query' => array(
-                        array('key' => 'course_root_lessons', 'value' => '"' . get_the_ID() . '"', 'compare' => 'LIKE'),
-                    ),
-                ));
-                if ($possible) {
-                    $panel_course_id = $possible[0]->ID;
-                }
-            }
+    <aside id="lesson-progress" class="lesson-progress progress-panel" popover>
+        <?php
+        // Determine a course to display in the panel: prefer any already-found $course_id,
+        // otherwise check the current lesson and its ancestors for a course that lists them as roots.
+        $panel_course_id = isset($course_id) && $course_id ? $course_id : null;
+        if (empty($panel_course_id)) {
+            $ancestors = get_post_ancestors(get_the_ID());
+            array_unshift($ancestors, get_the_ID());
 
-            if ($panel_course_id): ?>
-                <a class="link syllabus-course" href="<?php echo esc_url(get_permalink($panel_course_id)); ?>"><?php echo esc_html(get_the_title($panel_course_id)); ?></a>
-            <?php else: ?>
-                <a class="link syllabus-course" href="<?php echo esc_url(home_url()); ?>">Design for Humans</a>
-            <?php endif; ?>
-
-            <button class="syllabus-close button" command="hide-popover" commandfor="lesson-syllabus-panel">
-                Close navigation
-            </button>
-        </header>
-        <nav class="syllabus-nav" aria-label="Course syllabus">
-            <ul class="syllabus-list">
-                <?php
-                // If we have a course, render its selected roots; otherwise render top-level lessons
-                if (empty($course_id)) {
-                    $top_roots = get_posts(array('post_type' => 'lesson', 'post_parent' => 0, 'posts_per_page' => -1, 'orderby' => 'menu_order title', 'order' => 'ASC'));
-                    foreach ($top_roots as $root) {
-                        $is_current = ($root->ID === get_the_ID());
-                        $link_class = $is_current ? ' class="current"' : '';
-                        echo '<li><a' . $link_class . ' href="' . esc_url(get_permalink($root->ID)) . '"><span class="item-label module">' . esc_html(get_the_title($root->ID)) . '</span> <span class="chip">Complete</span></a>';
-                        echo dfh_render_lesson_children($root->ID);
-                        echo '</li>';
+            $all_courses = get_posts(array('post_type' => 'course', 'posts_per_page' => -1, 'fields' => 'ids'));
+            if (!empty($all_courses)) {
+                foreach ($all_courses as $c_id) {
+                    $roots = function_exists('get_field') ? get_field('course_root_lessons', $c_id) : get_post_meta($c_id, 'course_root_lessons', true);
+                    if (is_string($roots)) {
+                        $maybe = @unserialize($roots);
+                        if ($maybe !== false) $roots = $maybe;
                     }
-                } else {
-                    // Try ACF first, otherwise postmeta (expects array of IDs)
-                    $roots = function_exists('get_field') ? get_field('course_root_lessons', $course_id) : get_post_meta($course_id, 'course_root_lessons', true);
-                    if (!empty($roots) && is_array($roots)) {
-                        foreach ($roots as $r) {
-                            $r_id = is_object($r) ? $r->ID : (int) $r;
-                            $is_current = ($r_id === get_the_ID());
-                            $link_class = $is_current ? ' class="current"' : '';
-                            echo '<li><a' . $link_class . ' href="' . esc_url(get_permalink($r_id)) . '"><span class="item-label module">' . esc_html(get_the_title($r_id)) . '</span> <span class="chip">Complete</span></a>';
-                            echo dfh_render_lesson_children($r_id);
-                            echo '</li>';
+                    if (!empty($roots)) {
+                        foreach ($ancestors as $anc) {
+                            if (in_array($anc, (array) $roots)) {
+                                $panel_course_id = $c_id;
+                                break 2;
+                            }
                         }
                     }
                 }
+            }
+        }
+
+        ?>
+        <header class="progress-panel-header">
+            <a class="link syllabus-course" href="<?php echo esc_url(home_url()); ?>">Home</a>
+
+            <button class="syllabus-close button" command="hide-popover" commandfor="lesson-progress">
+                Close navigation
+            </button>
+        </header>
+            <nav class="progress-panel-course" aria-label="Course syllabus">
+            <?php
+            // Show the current Course title and link when available
+            $display_course_id = !empty($panel_course_id) ? $panel_course_id : (!empty($course_id) ? $course_id : null);
+            if ($display_course_id): ?>
+                <h2 class="heading progress-panel-course-name"><a href="<?php echo esc_url(get_permalink($display_course_id)); ?>"><?php echo esc_html(get_the_title($display_course_id)); ?></a></h2>
+            <?php else: ?>
+                <h2 class="heading progress-panel-course-name">Course</h2>
+            <?php endif; ?>
+                <?php
+                // If we have a course, get its roots; otherwise leave null to render top-level lessons
+                $roots = null;
+                if (!empty($course_id)) {
+                    $roots = function_exists('get_field') ? get_field('course_root_lessons', $course_id) : get_post_meta($course_id, 'course_root_lessons', true);
+                }
+
+                echo dfh_render_lesson_tree($roots, 1);
                 ?>
-            </ul>
         </nav>
-        <footer>
-            <span class="syllabus-panel-brand">
+        <footer class="progress-panel-footer">
+            <a href="https://designforhumans.blog" class="progress-panel-brand">
                 Design for Humans
-            </span>
+            </a>
         </footer>
     </aside>
     <article id="post-<?php the_ID(); ?>" <?php post_class('lesson-article'); ?>>
@@ -127,7 +129,6 @@ get_header();
         <header class="lesson-header prose">
             <div class="container">
                 <h1 class="lesson-title">
-
                     <?php the_title(); ?>
                 </h1>
             </div>
@@ -226,34 +227,6 @@ get_header();
         </div><!-- .lesson-content-container -->
 
     </article><!-- #post-<?php the_ID(); ?> -->
-
-
-
-    <?php
-    // Downloadable Assets - use newline meta saved by the Downloads meta box (`lesson_downloads`).
-    $download_meta = get_post_meta(get_the_ID(), 'lesson_downloads', true);
-    if (!empty($download_meta)):
-        $dlines = explode("\n", $download_meta);
-        ?>
-        <section class="lesson-resources lesson-downloads pd-fl-x2" aria-describedby="lesson-downloads-heading">
-            <h2 class="heading" id="lesson-downloads-heading">Downloadable Resources</h2>
-            <ul class="download-list">
-                <?php
-                foreach ($dlines as $dline) {
-                    $dline = trim($dline);
-                    if (empty($dline))
-                        continue;
-                    $parts = explode('|', $dline);
-                    $title = trim($parts[0]);
-                    $url = isset($parts[1]) ? trim($parts[1]) : '';
-                    if (empty($url))
-                        continue;
-                    echo '<li><a href="' . esc_url($url) . '" class="button download-button" download>' . esc_html($title) . '</a></li>';
-                }
-                ?>
-            </ul>
-        </section>
-    <?php endif; ?>
 </main><!-- #primary -->
 
 <?php

@@ -47,7 +47,7 @@ function dfh_register_lesson_cpt()
         'hierarchical' => true, // Enables parent/child lesson nesting
         'menu_icon' => 'dashicons-welcome-learn-more',
         'supports' => array('title', 'editor', 'thumbnail', 'revisions', 'page-attributes'), // page-attributes adds Parent Lesson dropdown
-        'rewrite' => array('slug' => 'lessons', 'with_front' => false),
+        'rewrite' => array('slug' => 'lesson', 'with_front' => false),
     );
 
     register_post_type('lesson', $args);
@@ -79,14 +79,14 @@ function dfh_register_course_cpt()
     $args = array(
         'labels' => $labels,
         'public' => true,
-        'has_archive' => 'courses',
+        'has_archive' => 'course',
         'publicly_queryable' => true,
         'show_ui' => true,
         'show_in_menu' => true,
         'show_in_rest' => true, // Enables Gutenberg block editor
         'menu_icon' => 'dashicons-welcome-add-page',
         'supports' => array('title', 'editor', 'thumbnail', 'excerpt', 'revisions', 'page-attributes'),
-        'rewrite' => array('slug' => 'courses', 'with_front' => false),
+        'rewrite' => array('slug' => 'course', 'with_front' => false),
     );
 
     register_post_type('course', $args);
@@ -247,36 +247,6 @@ function dfh_save_lesson_links_meta($post_id)
 }
 add_action('save_post', 'dfh_save_lesson_links_meta');
 
-/**
- * Register meta box for downloadable assets (simple textarea: one per line Title | URL)
- */
-function dfh_add_lesson_downloads_meta_box()
-{
-    add_meta_box(
-        'dfh_lesson_downloads_box',
-        'Lesson Downloadable Assets',
-        'dfh_render_downloads_meta_box_html',
-        'lesson',
-        'normal',
-        'high'
-    );
-}
-add_action('add_meta_boxes', 'dfh_add_lesson_downloads_meta_box');
-
-function dfh_render_downloads_meta_box_html($post)
-{
-    wp_nonce_field('dfh_save_downloads_meta', 'dfh_downloads_nonce');
-
-    $downloads = get_post_meta($post->ID, 'lesson_downloads', true);
-    ?>
-    <div style="margin-bottom: 10px;">
-        <label style="display: block; font-weight: 600; margin-bottom: 5px;">Downloads (one per line: Title | URL):</label>
-        <textarea name="lesson_downloads" rows="4" style="width: 100%; padding: 8px;" placeholder="Workbook | https://example.com/workbook.pdf"><?php echo esc_textarea($downloads); ?></textarea>
-        <p style="font-size: 12px; color: #666; margin-top: 5px;">Each line should contain a title, a pipe, then the URL.</p>
-    </div>
-    <?php
-}
-
 function dfh_save_lesson_downloads_meta($post_id)
 {
     if (!isset($_POST['dfh_downloads_nonce']) || !wp_verify_nonce($_POST['dfh_downloads_nonce'], 'dfh_save_downloads_meta')) {
@@ -305,7 +275,7 @@ function dfh_add_lesson_stats_meta_box()
         'Lesson Stats',
         'dfh_render_stats_meta_box_html',
         'lesson',
-        'side',
+        'normal',
         'default'
     );
 }
@@ -354,24 +324,6 @@ add_action('save_post', 'dfh_save_lesson_stats_meta');
  */
 
 if (function_exists('acf_add_local_field_group')) {
-    // Lesson-specific fields and repeaters
-    acf_add_local_field_group(array(
-        'key' => 'group_lesson_details',
-        'title' => 'Lesson Meta & Content',
-        // Fields for stats and downloads have moved to custom meta-boxes
-        // (dfh_lesson_stats_box, dfh_lesson_downloads_box) to avoid ACF
-        // plugin dependency. Keep the group intentionally lightweight.
-        'fields' => array(),
-        'location' => array(
-            array(
-                array(
-                    'param' => 'post_type',
-                    'operator' => '==',
-                    'value' => 'lesson',
-                ),
-            ),
-        ),
-    ));
 
     // Course-level syllabus selector
     acf_add_local_field_group(array(
@@ -500,10 +452,11 @@ function dfh_get_lesson_code($post_id = null)
  * Recursively renders a nested list of child lessons for a given parent lesson.
  *
  * @param int $parent_id The ID of the parent lesson.
+ * @param int $level The nesting level (1 = top-level children). Used for CSS hooks.
  * @return string HTML unordered list of child lessons, or empty string if none.
  */
 
-function dfh_render_lesson_children($parent_id)
+function dfh_render_lesson_children($parent_id, $level = 1)
 {
     $children = get_posts(array(
         'post_type' => 'lesson',
@@ -516,12 +469,77 @@ function dfh_render_lesson_children($parent_id)
     if (!$children)
         return '';
 
-    $output = '<ul class="sub-lesson-list">';
+    $lvl = intval($level);
+    $output = '<ul class="lesson-list l' . $lvl . '">';
     foreach ($children as $child) {
         $is_current = ($child->ID === get_the_ID());
-        $link_class = $is_current ? ' class="current"' : '';
-        $output .= '<li><a '.$link_class.' href="' . get_permalink($child->ID) . '"><span class="item-label lesson">' . get_the_title($child->ID) . '</span> <span class="chip">Complete</span></a>';
-        $output .= dfh_render_lesson_children($child->ID); // Recursion
+        $link_class = $is_current ? ' class="current lesson-item l' . $lvl . '"' : ' class="lesson-item l' . $lvl . '"';
+        $code = dfh_get_lesson_hierarchy_number($child->ID);
+        $code_html = $code ? '<span class="lesson-item-code">' . esc_html($code) . '</span> ' : '';
+        $data_lesson = $code ? $code : (string) $child->ID;
+        $output .= '<li class="lesson-list-item l' . $lvl . '" data-lesson="' . esc_attr($data_lesson) . '"><a ' . $link_class . ' href="' . get_permalink($child->ID) . '">' . $code_html . ' <span class="lesson-item-label l' . $lvl . '">' . get_the_title($child->ID) . '</span> <span class="chip">Complete</span></a>';
+        $output .= dfh_render_lesson_children($child->ID, $lvl + 1); // Recursion with incremented level
+        $output .= '</li>';
+    }
+    $output .= '</ul>';
+
+    return $output;
+}
+
+
+/**
+ * Render a lesson tree given an optional list of root IDs.
+ * If $roots is null, top-level lessons (post_parent = 0) are used.
+ *
+ * @param array|null $roots Array of post IDs to use as roots, or null to use top-level lessons.
+ * @param int $level Current nesting level.
+ * @return string HTML of nested lesson tree.
+ */
+function dfh_render_lesson_tree($roots = null, $level = 1)
+{
+    // If no explicit roots provided, render the children of parent 0
+    if (empty($roots)) {
+        return dfh_render_lesson_children(0, $level);
+    }
+
+    // Normalize roots to array of IDs
+    if (!is_array($roots)) {
+        $roots = array($roots);
+    }
+
+    $root_ids = array();
+    foreach ($roots as $r) {
+        $id = is_object($r) ? (int) $r->ID : (int) $r;
+        if ($id) $root_ids[] = $id;
+    }
+    $root_ids = array_values(array_unique($root_ids));
+
+    // Filter out any roots that are descendants of another selected root.
+    $filtered_roots = array();
+    foreach ($root_ids as $id) {
+        $ancestors = get_post_ancestors($id);
+        $is_descendant = false;
+        foreach ($root_ids as $other) {
+            if ($other === $id) continue;
+            if (in_array($other, $ancestors)) {
+                $is_descendant = true;
+                break;
+            }
+        }
+        if (!$is_descendant) $filtered_roots[] = $id;
+    }
+
+    $lvl = intval($level);
+    $output = '<ul class="lesson-list l' . $lvl . '">';
+    foreach ($filtered_roots as $r_id) {
+        $is_current = ($r_id === get_the_ID());
+        $link_class = $is_current ? ' class="current lesson-item l' . $lvl . '"' : ' class="lesson-item l' . $lvl . '"';
+        $code = dfh_get_lesson_hierarchy_number($r_id);
+        $code_html = $code ? '<span class="lesson-item-code">' . esc_html($code) . '</span> ' : '';
+        $data_lesson = $code ? $code : (string) $r_id;
+        $output .= '<li class="lesson-list-item l' . $lvl . '" data-lesson="' . esc_attr($data_lesson) . '"><a' . $link_class . ' href="' . esc_url(get_permalink($r_id)) . '">' . $code_html . '<span class="lesson-item-label l' . $lvl . '">' . esc_html(get_the_title($r_id)) . '</span> <span class="chip">Complete</span></a>';
+        // Append children (dfh_render_lesson_children outputs its own <ul>)
+        $output .= dfh_render_lesson_children($r_id, $lvl + 1);
         $output .= '</li>';
     }
     $output .= '</ul>';

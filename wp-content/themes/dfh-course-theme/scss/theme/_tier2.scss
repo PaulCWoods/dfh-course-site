@@ -1,1 +1,25 @@
-// Tier 2
+:is([data-lesson="1"], [data-syllabus="1"]) {
+    --ui-color-background-accent: light-dark(var(--color-red-200), var(--color-red-700));
+    --ui-color-background-accent-muted: light-dark(var(--color-red-100), var(--color-red-900));
+    --ui-color-background-accent-strong: light-dark(var(--color-red-600), var(--color-red-400));
+
+    --ui-color-foreground-accent: light-dark(var(--color-red-700), var(--color-red-300));
+    --ui-color-foreground-accent-hover: light-dark(var(--color-red-600), var(--color-red-400));
+    --ui-color-foreground-accent-pressed: light-dark(var(--color-red-700), var(--color-red-200));
+
+    --ui-color-border-accent: light-dark(var(--color-red-400), var(--color-red-600));
+    --ui-color-border-accent-strong: light-dark(var(--color-red-600), var(--color-red-400));
+}
+
+:is([data-lesson="2"], [data-syllabus="2"]) {
+    --ui-color-background-accent: light-dark(var(--color-green-200), var(--color-green-700));
+    --ui-color-background-accent-muted: light-dark(var(--color-green-100), var(--color-green-900));
+    --ui-color-background-accent-strong: light-dark(var(--color-green-600), var(--color-green-400));
+
+    --ui-color-foreground-accent: light-dark(var(--color-green-700), var(--color-green-300));
+    --ui-color-foreground-accent-hover: light-dark(var(--color-green-600), var(--color-green-400));
+    --ui-color-foreground-accent-pressed: light-dark(var(--color-green-700), var(--color-green-200));
+
+    --ui-color-border-accent: light-dark(var(--color-green-400), var(--color-green-600));
+    --ui-color-border-accent-strong: light-dark(var(--color-green-600), var(--color-green-400));
+}

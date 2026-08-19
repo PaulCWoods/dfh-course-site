@@ -27,6 +27,19 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@mux/mux-player"></script>
 </head>
-<body <?php body_class(); ?>>
+<?php
+// Compute a top-level syllabus index for lesson pages (1-based). Defaults to 0.
+$syllabus_index = 0;
+if (function_exists('is_singular') && is_singular('lesson')) {
+    if (function_exists('dfh_get_lesson_hierarchy_number')) {
+        $code = dfh_get_lesson_hierarchy_number(get_the_ID());
+        if (!empty($code)) {
+            $parts = explode('.', $code);
+            $syllabus_index = (int) $parts[0];
+        }
+    }
+}
+?>
+<body <?php body_class(); ?> data-syllabus="<?php echo esc_attr($syllabus_index); ?>">
 <?php wp_body_open(); ?>
 <div class="site">

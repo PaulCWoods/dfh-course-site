@@ -1,0 +1,13 @@
+.course-syllabus {
+    --syllabus-width: var(--spacing-28);
+
+    .heading {
+        margin-block-end: 1rem;
+    }
+
+    .lesson-list.l1 {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(var(--syllabus-width, 28rem), 100%), 1fr));
+        gap: var(--spacing-fluid);
+    }
+}

@@ -10,6 +10,7 @@ $lesson-bp: 60em;
 // Head and Navigation
 
 .lesson-head.site-header {
+    align-items: stretch;
     min-inline-size: 1px; // Needed to let the navigation link overflow ellipsis without breaking the layout.
     border-block-end: 0;
 }
@@ -24,11 +25,11 @@ $lesson-bp: 60em;
 .lesson-code-badge {
     align-self: stretch;
     align-items: center;
-    color: var(--ui-color-background-base);
-    background-color: var(--ui-color-foreground-base);
+    background-color: var(--ui-color-background-accent);
     display: flex;
     font-size: var(--typography-font-size-upper-1);
     font-weight: bold;
+    margin-inline-start: calc(var(--site-block-padding) * -1);
     padding-inline: var(--spacing-fluid);
 }
 
@@ -44,7 +45,7 @@ $lesson-bp: 60em;
     font-weight: bold;
 }
 
-.lesson-syllabus-toggle {
+.lesson-progress-toggle {
     padding: var(--spacing-05) var(--spacing-fluid);
 }
 

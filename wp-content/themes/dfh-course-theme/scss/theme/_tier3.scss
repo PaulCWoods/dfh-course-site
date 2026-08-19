@@ -13,3 +13,9 @@
         --lesson-syllabus-transition: 0s;
     }
 }
+
+:is([data-lesson], [data-syllabus]) {
+    --link-color: var(--ui-color-foreground-accent);
+    --link-hover-color: var(--ui-color-foreground-accent-hover);
+    --link-active-color: var(--ui-color-foreground-accent-pressed);
+}

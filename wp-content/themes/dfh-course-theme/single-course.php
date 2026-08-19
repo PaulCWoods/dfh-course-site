@@ -14,31 +14,24 @@ if (!$root_lessons) {
         <nav class="site-navigation">
             <ul class="site-breadcrumb container">
                 <li><a href="https://designforhumans.blog" class="link site-title">Design For Humans</a></li>
-                <li><a href="<?php echo esc_url( home_url( '/courses' )); ?>" class="nav-link link">Courses</a></li>
+                <li><a href="<?php echo esc_url( home_url( '/' )); ?>" class="nav-link link">Courses</a></li>
             </ul>
         </nav>
     </div>
 </header>
 <main class="course-landing site-main">
-    <header>
+    <article class="article container course-about prose">
+    <header class="article-header">
         <h1><?php the_title(); ?></h1>
-        <?php if (has_post_thumbnail()) the_post_thumbnail(); ?>
-        <div class="course-description">
-            <?php the_content(); ?>
-        </div>
     </header>
+    <?php if (has_post_thumbnail()) the_post_thumbnail(); ?>
+    <?php the_content(); ?>
+   </article>
 
-    <section class="course-syllabus">
-        <h2>Course Plan</h2>
+    <section class="course-syllabus container">
+        <h2 class="heading">Course Plan</h2>
         <?php if ($root_lessons) : ?>
-            <ul class="syllabus-list">
-                <?php foreach ($root_lessons as $root_id) : ?>
-                    <li>
-                        <a href="<?php echo get_permalink($root_id); ?>"><?php echo get_the_title($root_id); ?></a>
-                        <?php echo dfh_render_lesson_children($root_id); // Recursive helper ?>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
+            <?php echo dfh_render_lesson_tree($root_lessons, 1); ?>
         <?php endif; ?>
     </section>
 </main>
