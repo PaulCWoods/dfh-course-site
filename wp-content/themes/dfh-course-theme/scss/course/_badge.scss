@@ -1,0 +1,10 @@
+.badge {
+    background-color: var(--ui-color-foreground-base);
+    color: var(--ui-color-background-base);
+    font-size: var(--typography-font-size-lower-1);
+    font-weight: bold;
+    opacity: var(--ui-opacity-muted);
+    padding-block: 0.25em;
+    padding-inline: 0.5em;
+    text-transform: uppercase;
+}

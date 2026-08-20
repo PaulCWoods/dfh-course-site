@@ -1,3 +1,4 @@
+// ================================
 // Lesson page — layout and small utilities
 
 $lesson-bp: 60em;
@@ -7,6 +8,13 @@ $lesson-bp: 60em;
     padding: 0;
 }
 
+.lesson-article {
+    display: flex;
+    flex-direction: column;
+    min-block-size: 100%;
+}
+
+// ================================
 // Head and Navigation
 
 .lesson-head.site-header {
@@ -18,7 +26,7 @@ $lesson-bp: 60em;
 .lesson-head-inner {
     align-items: center;
     display: flex;
-    gap: var(--spacing-1);
+    gap: var(--ui-spacing-unit);
     inline-size: 100%;
 }
 
@@ -27,14 +35,19 @@ $lesson-bp: 60em;
     align-items: center;
     background-color: var(--ui-color-background-accent);
     display: flex;
-    font-size: var(--typography-font-size-upper-1);
+    font-size: var(--typography-font-size-fluid-upper-1);
     font-weight: bold;
     margin-inline-start: calc(var(--site-block-padding) * -1);
     padding-inline: var(--spacing-fluid);
+
+    @media screen and (width > #{$lesson-bp}) {
+        margin-inline-start: 0;
+    }
 }
 
 .lesson-nav {
     flex-grow: 1;
+    font-size: var(--typography-font-size-fluid-base);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -46,7 +59,7 @@ $lesson-bp: 60em;
 }
 
 .lesson-progress-toggle {
-    padding: var(--spacing-05) var(--spacing-fluid);
+    flex-shrink: 0;
 }
 
 // Shared surface for header and video areas
@@ -56,10 +69,12 @@ $lesson-bp: 60em;
     color-scheme: dark;
 }
 
-// -----------
+// ================================
 // Title row: badge + title
 
-.lesson-header {
+:where(.lesson-header,
+.lesson-content,
+.lesson-explore) {
     padding-block: var(--site-block-padding, var(--spacing-fluid-x2));
     padding-inline-start: calc(var(--site-block-padding, var(--spacing-fluid-x2)) + env(safe-area-inset-left));
     padding-inline-end: calc(var(--site-block-padding, var(--spacing-fluid-x2)) + env(safe-area-inset-left));
@@ -73,8 +88,13 @@ $lesson-bp: 60em;
     margin-block-end: 0; // keep title snug to content
 }
 
+.lesson-kicker {
+    display: block;
+    font-weight: bold;
+    margin-block-start: var(--spacing-05);
+}
 
-// -----------
+// ================================
 // Video container: collapse inline whitespace around <mux-player>
 
 .lesson-video {
@@ -94,14 +114,12 @@ $lesson-bp: 60em;
 }
 
 
-// -----------
+// ================================
 // Main and body
 
 // Main grid: content + optional side column for stats
 .lesson-content {
-    padding-block: var(--site-block-padding, var(--spacing-fluid-x2));
-    padding-inline-start: calc(var(--site-block-padding, var(--spacing-fluid-x2)) + env(safe-area-inset-left));
-    padding-inline-end: calc(var(--site-block-padding, var(--spacing-fluid-x2)) + env(safe-area-inset-left));
+    flex-grow: 1;
 }
 
 .lesson-main {
@@ -113,30 +131,35 @@ $lesson-bp: 60em;
 // Lesson body (article content)
 .lesson-body {
     grid-column: 1 / -1;    
-}
+    padding-block-end: var(--spacing-fluid-x2);
 
-@media screen and (width > #{$lesson-bp}) {
-    .lesson-body {
+    @media screen and (width > #{$lesson-bp}) {
         grid-column: span 2; // content spans two columns on wide screens
     }
 }
 
-// -----------
+// ================================
 // Resources
 
+:is(.lesson-resources,
+.lesson-bookmark) {
+    margin-block-end: var(--spacing-fluid-x2);
+}
 
+.lesson-bookmark {
+    text-align: end;
+}
 
 .lesson-resources {
-    border-block-start: var(--ui-border);
-    margin-block-end: var(--spacing-fluid-x2);
-    padding-block-start: var(--spacing-1);
+    border-block-start: var(--ui-border-subtle);
+    padding-block-start: var(--spacing-fluid-x2);
 }
 
 .lesson-resources-heading {
     margin-block-end: var(--spacing-fluid, 1em);
 }
 
-// -----------
+// ================================
 // Stats
 
 // Stats column (renders as a definition list in markup)
@@ -144,7 +167,7 @@ $lesson-bp: 60em;
     align-self: start;
     grid-column: 1 / -1;
     position: sticky;
-    inset-block-start: calc(var(--lesson-aside-sticky-top, var(--spacing-4)) + var(--spacing-1));
+    inset-block-start: calc(var(--lesson-aside-sticky-top, var(--spacing-4)) + var(--ui-spacing-unit));
 
     @media screen and (width > #{$lesson-bp}) {
         grid-column: span 1; // occupy the third column on wide screens
@@ -153,7 +176,7 @@ $lesson-bp: 60em;
 
 
 .lesson-stats-heading {
-    margin-block-end: var(--spacing-1);
+    margin-block-end: var(--ui-spacing-unit);
 }
 
 // Stats list layout helper — default small-vertical list
@@ -161,4 +184,41 @@ $lesson-bp: 60em;
     display: flex;
     flex-direction: column;
     gap: var(--spacing-05);
+}
+
+// ================================
+// Explore area (Child lessons and progression to next statge
+
+.lesson-explore {
+    background: var(--ui-color-background-surface);
+    box-shadow: var(--ui-shadow-inset);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: calc(var(--site-block-padding, var(--spacing-fluid-x2))*2);
+    padding-block: calc(var(--site-block-padding, var(--spacing-fluid-x2))*2);
+
+    .heading {
+        margin-block-end: var(--ui-spacing-unit);
+    }
+}
+
+.lesson-explore-section  {
+    inline-size: 100%;
+}
+
+.lesson-progression {
+    margin-block-start: auto;
+}
+
+.lesson-progression-buttons {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ui-spacing-unit);
+    justify-content: flex-end;
+
+    .prev-lesson {
+        margin-inline-end: auto;
+    }
 }
