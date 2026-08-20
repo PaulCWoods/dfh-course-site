@@ -957,7 +957,7 @@ function dfh_custom_login_styles() {
     ?>
     <style type="text/css">
         .wp-login-logo { display: none; }
-        
+
         body.login {
             background-color: #f9f9f9; /* Match your background token */
         }
@@ -977,3 +977,37 @@ function dfh_custom_login_styles() {
     <?php
 }
 add_action( 'login_enqueue_scripts', 'dfh_custom_login_styles' );
+
+/**
+ * Redirect course students to the course page upon login instead of the WP Dashboard.
+ * Administrators are still allowed into the dashboard.
+ *
+ * @param string  $redirect_to           The default redirect destination.
+ * @param string  $requested_redirect_to The requested redirect destination.
+ * @param WP_User $user                  The logged-in user object.
+ * @return string                        The modified redirect URL.
+ */
+function dfh_redirect_student_after_login( $redirect_to, $requested_redirect_to, $user ) {
+    // Make sure $user is a valid WP_User object
+    if ( isset( $user->roles ) && is_array( $user->roles ) ) {
+        // If they are a course student (and NOT an administrator), redirect to the course
+        if ( in_array( 'course_student', $user->roles, true ) && ! in_array( 'administrator', $user->roles, true ) ) {
+            return home_url( '/course/' ); // Adjust if your course archive/slug differs
+        }
+    }
+    
+    return $redirect_to;
+}
+add_filter( 'login_redirect', 'dfh_redirect_student_after_login', 10, 3 );
+
+/**
+ * Hide the WordPress admin bar for course students.
+ * Administrators will still see it.
+ */
+function dfh_hide_admin_bar_for_students( $show ) {
+    if ( current_user_can( 'course_student' ) && ! current_user_can( 'administrator' ) ) {
+        return false;
+    }
+    return $show;
+}
+add_filter( 'show_admin_bar', 'dfh_hide_admin_bar_for_students' );
