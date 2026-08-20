@@ -79,7 +79,7 @@ if (!$root_lessons) {
                 <!-- State 0: Guest Visitor -->
                 <?php $welcome_back_msg; ?>
                 <h2>Ready to start learning?</h2>
-                <p>Log in or enroll to access the course syllabus and track your progress.</p>
+                <p class="small-text tc-muted">Log in or enroll to access the course syllabus and track your progress.</p>
                 <a href="<?php echo esc_url(home_url('/login/')); ?>" class="button">Log in to access
                     course</a>
 
@@ -117,7 +117,7 @@ if (!$root_lessons) {
                 <!-- State 1: Brand New (Not Started) -->
                 <?php echo $welcome_msg; ?>
                 <h2>Ready to Begin?</h2>
-                <p>Jump straight into the first lesson of the course.</p>
+                <p class="small-text tc-muted">Jump straight into the first lesson of the course.</p>
                 <?php if (!empty($all_lessons)):
                     $first_lesson_url = get_permalink($all_lessons[0]);
                     ?>
