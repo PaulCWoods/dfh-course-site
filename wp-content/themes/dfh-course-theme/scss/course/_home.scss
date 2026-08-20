@@ -1,4 +1,5 @@
 .home-hero {
+    border-block-start: var(--ui-border-subtle);
     padding-block: var(--spacing-fluid-x2);
 }
 
@@ -6,6 +7,10 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--ui-spacing-unit);
+}
+
+.home-hero__logged-in {
+    margin-block-end: var(--ui-spacing-unit);
 }
 
 .home-section {
