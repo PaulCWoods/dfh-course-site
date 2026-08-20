@@ -11,6 +11,20 @@ $bookmark_icon = $is_bookmarked ? '#Bookmarked' : '#Bookmark';
 if (!dfh_user_has_course_access()) {
     get_header();
     ?>
+    <header class="site-header">
+        <div class="container site-header-inner">
+            <nav class="site-navigation">
+                <ul class="site-breadcrumb container">
+                    <li>
+                        <a href="<?php echo esc_url(home_url('/')); ?>" class="link site-title">
+                            <svg class="icon dir" width="32" height="32" aria-hidden="true"><use href="#Home" /></svg>
+                            Courses Home
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
     <main class="restricted-access site-main">
         <article class="article prose container">
             <h1>Student-only content</h1>
