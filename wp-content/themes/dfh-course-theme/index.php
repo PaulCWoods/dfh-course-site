@@ -75,20 +75,20 @@ get_header();
 
             if ($courses_query->have_posts()):
                 ?>
-                    <ul class="course-grid">
+                    <ul class="course-card-list index-card-list">
                         <?php while ($courses_query->have_posts()):
                             $courses_query->the_post(); ?>
-                                <li class="course-grid__item">
-                                    <div class="course-card">
+                                <li class="index-card-list__item">
+                                    <div class="index-card course-card">
                                         <?php if (has_post_thumbnail()): ?>
-                                                <div class="course-card__thumb">
+                                                <div class="index-card__thumb">
                                                     <a href="<?php the_permalink(); ?>">
                                                         <?php the_post_thumbnail('medium_large'); ?>
                                                     </a>
                                                 </div>
                                         <?php endif; ?>
-                                        <div class="course-card__content">
-                                            <a class="course-card__link link" href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                                        <div class="index-card__content">
+                                            <a class="index-card__link link" href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
                                             <?php the_excerpt(); ?>
                                             <?php if (function_exists('dfh_user_has_course_access') && dfh_user_has_course_access()): ?>
                                                     <span class="course-card__badge enrolled badge">Enroled</span>

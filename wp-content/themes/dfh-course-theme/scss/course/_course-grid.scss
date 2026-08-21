@@ -1,59 +1,6 @@
 
-.course-grid {
-    --course-item-width: var(--spacing-20);
-
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(var(--course-item-width, 20rem), 100%), 1fr));
-    gap: var(--spacing-fluid);
-    list-style: none;
-
-    li {
-        display: flex;
-    }
-}
-
-
-.course-card {
-    background-color: var(--entry-card-background-color);
-    border-block-start: var(--ui-border);
-    box-shadow: var(--ui-shadow);
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    position: relative;
-}
-
-.course-card__content {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    gap: calc(var(--spacing-fluid) / var(--sizing-ratio));
-    padding: var(--spacing-fluid);
-
-    p {
-        line-height: var(--typography-line-height-lower-1);
-    }
-}
-
-.course-card__thumb {
-    font-size: 0;
-    img {
-        aspect-ratio: 2/1;
-        block-size: auto;
-        inline-size: 100%;
-        object-fit: cover;
-    }
-}
-
-.course-card__link {
-    font-size: var(--entry-card-title-font-size);
-    font-weight: var(--entry-card-title-font-weight);
-    line-height: var(--entry-card-title-line-height);
-    &:after {
-        content: "";
-        position: absolute;
-        inset: 0;
-    }
+.course-card-list {
+    --index-card-width: var(--spacing-20);
 }
 
 .course-card__badge {
